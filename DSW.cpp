@@ -134,7 +134,7 @@ void compress(Node* root, int times)
 
 void createCompleteTree(Node*& root)
 {
-    Node* dummyNode = createNode(0);
+    Node* dummyNode = createNode(0);    // dummy node technicl
     dummyNode->p_right = root;
     int n = createBackBone(dummyNode);
     int m = pow(2, (int) log2(n + 1)) - 1;
