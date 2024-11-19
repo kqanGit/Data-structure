@@ -5,26 +5,26 @@ using namespace std;
 struct Node
 {
     int key;
-    Node* p_left;
-    Node* p_right;
-    int height;  
+    Node *p_left;
+    Node *p_right;
+    int height;
 };
 
-Node* createNode(int data)
+Node *createNode(int data)
 {
-    return new Node {data, nullptr, nullptr, 1};
+    return new Node{data, nullptr, nullptr, 1};
 }
 
-int height(Node* node)
+int height(Node *node)
 {
-    if (node == nullptr) 
+    if (node == nullptr)
     {
         return 0;
     }
     return node->height;
 }
 
-int balancedFactor(Node* node)
+int balancedFactor(Node *node)
 {
     if (node == nullptr)
     {
@@ -33,7 +33,7 @@ int balancedFactor(Node* node)
     return height(node->p_left) - height(node->p_right);
 }
 
-void inOrderTraversal(Node* root)
+void inOrderTraversal(Node *root)
 {
     if (root == nullptr)
     {
@@ -45,10 +45,10 @@ void inOrderTraversal(Node* root)
     inOrderTraversal(root->p_right);
 }
 
-void rotateRight(Node*& A)
+void rotateRight(Node *&A)
 {
     // rotate tree
-    Node* B = A->p_left;
+    Node *B = A->p_left;
     A->p_left = B->p_right;
     B->p_right = A;
 
@@ -58,10 +58,10 @@ void rotateRight(Node*& A)
     A = B;
 }
 
-void rotateLeft(Node*& A)
+void rotateLeft(Node *&A)
 {
     // same as rotateRight
-    Node* B = A->p_right;
+    Node *B = A->p_right;
     A->p_right = B->p_left;
     B->p_left = A;
 
@@ -70,7 +70,7 @@ void rotateLeft(Node*& A)
     A = B;
 }
 
-void insert(Node*& root, int data)
+void insert(Node *&root, int data)
 {
     if (root == nullptr)
     {
@@ -93,7 +93,7 @@ void insert(Node*& root, int data)
 
     root->height = 1 + max(height(root->p_left), height(root->p_right));
     int balance = balancedFactor(root);
-    
+
     // left left
     if (balance > 1 && root->p_left->key > data)
     {
@@ -125,12 +125,97 @@ void insert(Node*& root, int data)
     // do not thing if balace = {-1, 0, 1}
 }
 
+void remove(Node *&root, int data)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    if (root->key > data)
+    {
+        remove(root->p_left, data);
+    }
+    else if (root->key < data)
+    {
+        remove(root->p_right, data);
+    }
+    else
+    {
+        if (root->p_left == nullptr || root->p_right == nullptr)
+        {
+            Node *temp = nullptr;
+            if (root->p_left == nullptr)
+            {
+                temp = root->p_right;
+            }
+            else
+            {
+                temp = root->p_left;
+            }
+
+            delete root;
+            root = temp;
+        }
+        else
+        {
+            Node *successor = root->p_right;
+            while (successor->p_left != nullptr)
+            {
+                successor = successor->p_left;
+            }
+            root->key = successor->key;
+            remove(root->p_right, root->key);
+        }
+    }
+
+    // if node need to be delete is leaf
+    if (root == nullptr)
+    {
+        return;
+    }
+    root->height = 1 + max(height(root->p_left), height(root->p_right));
+    int balance = balancedFactor(root);
+
+    // left left
+    if (balance > 1 && balancedFactor(root->p_left) == 1)
+    {
+        rotateRight(root);
+        return;
+    }
+
+    // left right
+    if (balance > 1 && balancedFactor(root->p_left) == -1)
+    {
+        rotateLeft(root->p_left);
+        rotateRight(root);
+    }
+
+    // right right
+    if (balance < -1 && balancedFactor(root->p_right) == -1)
+    {
+        rotateLeft(root);
+        return;
+    }
+
+    // right left
+    if (balance < -1 && balancedFactor(root->p_right) == 1)
+    {
+        rotateRight(root->p_right);
+        rotateLeft(root);
+    }
+}
+
 int main()
 {
-    Node* root = nullptr;
-    insert(root, 1);
+    Node *root = nullptr;
+    insert(root, 10);
+    insert(root, 5);
     insert(root, 2);
-    insert(root, 3);
+    insert(root, 11);
     insert(root, 4);
+    inOrderTraversal(root);
+    cout << endl;
+    remove(root, 2);
     inOrderTraversal(root);
 }
