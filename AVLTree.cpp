@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cmath>
+#include <queue>
 using namespace std;
 
 struct Node
@@ -206,16 +206,46 @@ void remove(Node *&root, int data)
     }
 }
 
+void printLevelOrder(Node* root)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+    queue<Node*> q;
+    q.push(root);
+    while(!q.empty())
+    {
+        Node* node = q.front();
+        q.pop();
+        cout << node->key << ' ';
+        if (node->p_left != nullptr)
+        {
+            q.push(node->p_left);
+        }
+        if (node->p_right != nullptr)
+        {
+            q.push(node->p_right);
+        }
+    }
+}
+
+
 int main()
 {
     Node *root = nullptr;
     insert(root, 10);
-    insert(root, 5);
-    insert(root, 2);
     insert(root, 11);
+    insert(root, 12);
+    insert(root, 13);
+	insert(root, 14);
+	insert(root, 15);
+    insert(root, 5);
     insert(root, 4);
+    insert(root, 3);
+    insert(root, 1);
     inOrderTraversal(root);
     cout << endl;
     remove(root, 2);
-    inOrderTraversal(root);
+    printLevelOrder(root);
 }
