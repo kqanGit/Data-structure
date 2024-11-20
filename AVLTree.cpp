@@ -230,6 +230,41 @@ void printLevelOrder(Node* root)
     }
 }
 
+int levelOfNode(Node* root, Node* p)
+{
+    if (root == nullptr)
+    {
+        return -1;
+    }
+    queue <Node*> q;
+    int level = 0;
+    int countNode = 0;
+    q.push(root);
+    while(!q.empty())
+    {
+        countNode = q.size();
+        level++;
+        for (int i = 0; i < countNode; i++)
+        {
+            Node* node = q.front();
+            q.pop();
+            if (node == p)
+            {
+                return level;
+            }
+            if (node->p_left != nullptr)
+            {
+                q.push(node->p_left);
+            }
+            if (node->p_right != nullptr)
+            {
+                q.push(node->p_right);
+            }
+        }
+    }
+    return -1;
+}
+
 
 int main()
 {
@@ -238,14 +273,11 @@ int main()
     insert(root, 11);
     insert(root, 12);
     insert(root, 13);
-	insert(root, 14);
-	insert(root, 15);
-    insert(root, 5);
-    insert(root, 4);
-    insert(root, 3);
-    insert(root, 1);
+    insert(root, 9);
     inOrderTraversal(root);
     cout << endl;
-    remove(root, 2);
+    remove(root, 11);
     printLevelOrder(root);
+    cout << endl;
+    cout << levelOfNode(root, root);
 }
