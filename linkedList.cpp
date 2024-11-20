@@ -1,176 +1,124 @@
 #include <iostream>
 using namespace std;
 
-struct TNode
+struct Node
 {
     int key;
-    TNode* pLeft;
-    TNode* pRight;
+    Node* next;
 };
 
-struct BST
+Node* createNode(int data)
 {
-    TNode* root;
-};
-
-BST* initialize()
-{
-    return new BST{nullptr};
+    return new Node {data, nullptr};
 }
 
-void deinitializeHelper(TNode*& root)
+void pushBack(Node*& head, int data)
 {
-    if (root == nullptr)
+    Node* node = createNode(data);
+    if (head == nullptr)
     {
+        head = node;
         return;
     }
-    deinitializeHelper(root->pLeft);
-    deinitializeHelper(root->pRight);
-    delete root;
-    root = nullptr;
+    Node* tail = head;
+    while(tail->next != nullptr)
+    {
+        tail = tail->next;
+    }
+    tail->next = node;
 }
 
-void deinitialize(BST* tree)
+Node* findMid(Node* head)
 {
-    deinitializeHelper(tree->root);
+    Node* fast = head;
+    Node* slow = head;
+    while(fast && fast->next)
+    {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    return slow;
 }
 
-TNode* newNode(int value)
+Node* merge(Node* A, Node* B)
 {
-    TNode* node = new TNode;
-    if (!node)
+    Node* head = nullptr;
+    Node* node = nullptr;
+    while(A && B)
     {
-        cout << "Memory is full" << endl;
-        return nullptr;
-    }
-    node->key = value;
-    node->pRight = nullptr;
-    node->pLeft = nullptr;
-    return node;
-}
-
-void insertHelper(TNode*& root, int value)
-{
-    if (root == nullptr)
-    {
-        root = newNode(value);
-        return;
-    }
-    
-    if (root->key > value)
-    {
-        insertHelper(root->pLeft, value);
-        return;
-    }
-
-    if (root->key < value)
-    {
-        insertHelper(root->pRight, value);
-        return;
-    }
-}
-
-void insert(BST* tree, int value)
-{
-    insertHelper(tree->root, value);
-}
-
-int successor(TNode* root)
-{
-    TNode* node = root->pRight;
-    while(node->pLeft != nullptr)
-    {
-        node = node->pLeft;
-    }
-    return node->key;
-}
-
-TNode* removeHelper(TNode* root, int value)
-{
-    if (root == nullptr)
-    {
-        return root;
-    }
-    
-    if (root->key > value)
-    {
-        root->pLeft = removeHelper(root->pLeft, value);
-        return root;
-    }
-
-    if (root->key < value)
-    {
-        root->pRight = removeHelper(root->pRight, value);
-        return root;
-    }
-
-    // if root->key = value
-
-    if (root->pLeft == nullptr || root->pRight == nullptr)
-    {
-        TNode* tmp = nullptr;
-        if (root->pLeft == nullptr)
+        Node* temp = nullptr;
+        if (A->key < B->key)
         {
-            tmp = root->pRight;            
+            temp = A;
+            A = A->next;
         }
         else
         {
-            tmp = root->pLeft;
+            temp = B;
+            B = B->next;
         }
-        
-        delete root;
-        root = nullptr;
-        return tmp;
+
+        if (head == nullptr)
+        {
+            head = temp;
+            node = temp;
+        }
+        else
+        {
+            node->next = temp;
+            node = temp;
+        }
+    }
+
+    if (A != nullptr)
+    {
+        node->next = A;
     }
     
-    root->key = successor(root);
-    root->pRight = removeHelper(root->pRight, root->key);
-    return root;
+    if (B != nullptr)
+    {
+        node->next = B;
+    }
+    
+    return head;
 }
 
-void remove(BST* tree, int value)
+void mergeSort(Node*& head)
 {
-    removeHelper(tree->root, value);
-}
-
-void inOrderTraverse(TNode* root)
-{
-    if (root == nullptr)
+    if (!head || !head->next)
     {
         return;
     }
-    inOrderTraverse(root->pLeft);
-    cout << root->key << ' ';
-    inOrderTraverse(root->pRight);
+
+    Node* mid = findMid(head);
+    Node* prev_mid = head;
+    while(prev_mid->next != mid)
+    {
+        prev_mid = prev_mid->next;
+    }
+    prev_mid->next = nullptr;
+    mergeSort(head);
+    mergeSort(mid);
+    head = merge(head, mid);
 }
 
-void printTree(BST* tree)
+void printList(Node* head)
 {
-    if (tree->root == nullptr)
+    for (Node* node = head; node != nullptr; node = node->next)
     {
-        cout << "Tree is empty" << endl;
+        cout << node->key << ' ';
     }
-    inOrderTraverse(tree->root);
     cout << endl;
 }
 
 int main()
 {
-    BST* tree = initialize();
-    insert(tree, 6);
-    insert(tree, 3);
-    insert(tree, 10);
-    insert(tree, 2);
-    insert(tree, 4);
-    insert(tree, 7);
-    insert(tree, 20);
-    insert(tree, 30);
-    insert(tree, 40);
-    printTree(tree);
-    cout << endl;
-    remove(tree, 6);
-    remove(tree, 3);
-    printTree(tree);
-    deinitialize(tree);
-    printTree(tree);
+    Node* head = nullptr;
+    pushBack(head, 1);
+    pushBack(head, -1);
+    pushBack(head, 4);
+    pushBack(head, 3);
+    printList(head);
+    mergeSort(head);
+    printList(head);
 }
