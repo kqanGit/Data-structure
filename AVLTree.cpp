@@ -265,19 +265,40 @@ int levelOfNode(Node* root, Node* p)
     return -1;
 }
 
+int floor(Node* root, int k)
+{
+    if (root == nullptr)
+    {
+        return -1;
+    }
+
+    if (root->key == k)
+    {
+        return k;
+    }
+
+    if (root->key > k)
+    {
+        return floor(root->p_left, k);
+    }
+    
+    return max(root->key, floor(root->p_right, k));
+}
+
 
 int main()
 {
     Node *root = nullptr;
-    insert(root, 10);
-    insert(root, 11);
-    insert(root, 12);
     insert(root, 13);
     insert(root, 9);
+    insert(root, 22);
+    insert(root, 10);
+    insert(root, 15);
     inOrderTraversal(root);
     cout << endl;
     remove(root, 11);
     printLevelOrder(root);
     cout << endl;
-    cout << levelOfNode(root, root);
+    cout << levelOfNode(root, root->p_right->p_left) << endl;
+    cout << floor(root, 8);
 }
